@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nutrition Client Manager</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Top Header -->
+    <header class="topbar">
+        <div>
+            <p class="eyebrow">NUTRITION PROFESSIONAL WORKSPACE</p>
+            <h1>Nutrition Client Manager</h1>
+            <p class="subtitle">Manage client details, consultations, plans and progress in one place.</p>
+        </div>
+        <div class="header-mark">NM</div>
+    </header>
+
+    <main class="container">
+
+        <!-- Dashboard Summary Boxes -->
+        <section class="stats">
+            <div class="stat-card">
+                <span>Total clients</span>
+                <strong id="totalClients">0</strong>
+            </div>
+            <div class="stat-card">
+                <span>Upcoming follow-ups</span>
+                <strong id="upcomingCount">0</strong>
+            </div>
+            <div class="stat-card">
+                <span>Meal plans saved</span>
+                <strong id="mealPlanCount">0</strong>
+            </div>
+        </section>
+
+        <!-- Client Directory -->
+        <section class="panel">
+            <div class="section-heading">
+                <div>
+                    <p class="eyebrow">CLIENT DIRECTORY</p>
+                    <h2>Client profiles</h2>
+                </div>
+                <button type="button" class="primary-btn" onclick="openAddClientForm()">+ Add client</button>
+            </div>
+
+            <input
+                id="searchClients"
+                class="search"
+                type="search"
+                placeholder="Search clients by name, email or phone"
+                oninput="renderDashboard()"
+            >
+
+            <div id="clientList" class="client-list">
+                <p class="empty">No clients yet. Add your first client to get started.</p>
+            </div>
+        </section>
+
+        <!-- Add Client Form -->
+        <section class="panel" id="clientFormPanel" hidden>
+            <div class="section-heading">
+                <div>
+                    <p class="eyebrow">NEW PROFILE</p>
+                    <h2>Add a client</h2>
+                </div>
+                <button type="button" class="text-btn" onclick="closeAddClientForm()">Close</button>
+            </div>
+
+            <form id="clientForm" class="form-grid" onsubmit="addClient(event)">
+                <label>Full name *<input id="clientName" required placeholder="e.g. Priya Sharma"></label>
+                <label>Email<input id="clientEmail" type="email" placeholder="client@example.com"></label>
+                <label>Phone<input id="clientPhone" type="tel" placeholder="Phone number"></label>
+                <label>Date of birth<input id="clientDob" type="date"></label>
+                <label class="full">Dietary preferences / allergies<textarea id="clientDiet" rows="2" placeholder="Vegetarian, lactose-free, allergies, etc."></textarea></label>
+                <label class="full">General notes<textarea id="clientNotes" rows="2" placeholder="Relevant client information"></textarea></label>
+                <div class="full form-actions">
+                    <button class="primary-btn" type="submit">Save client</button>
+                </div>
+            </form>
+        </section>
+
+        <!-- Client Workspace -->
+        <section class="panel" id="workspace" hidden>
+            <div class="section-heading">
+                <div>
+                    <p class="eyebrow">CLIENT WORKSPACE</p>
+                    <h2 id="workspaceName">Client details</h2>
+                </div>
+                <button type="button" class="text-btn" onclick="closeWorkspace()">Close</button>
+            </div>
+
+            <div class="profile-summary" id="profileSummary"></div>
+
+            <!-- Tabs -->
+            <nav class="tabs">
+                <button type="button" class="tab active" id="tabBtn-consultation" onclick="switchTab('consultation')">Consultations</button>
+                <button type="button" class="tab" id="tabBtn-meal" onclick="switchTab('meal')">Meal plans</button>
+                <button type="button" class="tab" id="tabBtn-goal" onclick="switchTab('goal')">Goals</button>
+                <button type="button" class="tab" id="tabBtn-followup" onclick="switchTab('followup')">Follow-ups</button>
+                <button type="button" class="tab" id="tabBtn-progress" onclick="switchTab('progress')">Progress notes</button>
+                <button type="button" class="tab" id="tabBtn-history" onclick="switchTab('history')">History</button>
+            </nav>
+
+            <!-- Tab 1: Consultations -->
+            <div class="tab-content" id="consultationTab">
+                <h3>Add consultation record</h3>
+                <form id="consultationForm" class="form-grid" onsubmit="addConsultation(event)">
+                    <label>Date *<input id="consultDate" type="date" required></label>
+                    <label>Consultation type<input id="consultType" placeholder="Initial / Review"></label>
+                    <label class="full">Discussion and recommendations<textarea id="consultDetails" rows="3" required placeholder="Topics discussed, recommendations and observations"></textarea></label>
+                    <div class="full form-actions"><button type="submit" class="primary-btn">Save consultation</button></div>
+                </form>
+                <div id="consultationRecords" class="record-list"></div>
+            </div>
+
+            <!-- Tab 2: Meal Plans -->
+            <div class="tab-content" id="mealTab" hidden>
+                <h3>Create meal plan</h3>
+                <form id="mealForm" class="form-grid" onsubmit="addMealPlan(event)">
+                    <label>Plan name *<input id="mealName" required placeholder="e.g. Balanced weekly plan"></label>
+                    <label>Start date<input id="mealDate" type="date"></label>
+                    <label class="full">Breakfast<textarea id="mealBreakfast" rows="2" placeholder="Meals and portions"></textarea></label>
+                    <label class="full">Lunch<textarea id="mealLunch" rows="2" placeholder="Meals and portions"></textarea></label>
+                    <label class="full">Dinner<textarea id="mealDinner" rows="2" placeholder="Meals and portions"></textarea></label>
+                    <label class="full">Snacks / notes<textarea id="mealSnacks" rows="2" placeholder="Snacks, hydration and other notes"></textarea></label>
+                    <div class="full form-actions"><button type="submit" class="primary-btn">Save meal plan</button></div>
+                </form>
+                <div id="mealRecords" class="record-list"></div>
+            </div>
+
+            <!-- Tab 3: Goals -->
+            <div class="tab-content" id="goalTab" hidden>
+                <h3>Set a client goal</h3>
+                <form id="goalForm" class="form-grid" onsubmit="addGoal(event)">
+                    <label>Goal *<input id="goalTitle" required placeholder="e.g. Include vegetables at lunch"></label>
+                    <label>Target date<input id="goalTarget" type="date"></label>
+                    <label>
+                        Status
+                        <select id="goalStatus">
+                            <option>Not started</option>
+                            <option>In progress</option>
+                            <option>Completed</option>
+                        </select>
+                    </label>
+                    <label class="full">Details<textarea id="goalDetails" rows="2" placeholder="How will progress be measured?"></textarea></label>
+                    <div class="full form-actions"><button type="submit" class="primary-btn">Save goal</button></div>
+                </form>
+                <div id="goalRecords" class="record-list"></div>
+            </div>
+
+            <!-- Tab 4: Follow-ups -->
+            <div class="tab-content" id="followupTab" hidden>
+                <h3>Schedule a follow-up</h3>
+                <form id="followupForm" class="form-grid" onsubmit="addFollowup(event)">
+                    <label>Date and time *<input id="followupDate" type="datetime-local" required></label>
+                    <label>Purpose<input id="followupPurpose" placeholder="Progress review"></label>
+                    <div class="full form-actions"><button type="submit" class="primary-btn">Schedule follow-up</button></div>
+                </form>
+                <div id="followupRecords" class="record-list"></div>
+            </div>
+
+            <!-- Tab 5: Progress Notes -->
+            <div class="tab-content" id="progressTab" hidden>
+                <h3>Add progress note</h3>
+                <form id="progressForm" class="form-grid" onsubmit="addProgress(event)">
+                    <label>Date *<input id="progressDate" type="date" required></label>
+                    <label>Measurement / topic<input id="progressTopic" placeholder="Energy, habits, measurements, etc."></label>
+                    <label class="full">Progress notes *<textarea id="progressDetails" rows="3" required placeholder="Record the client's reported progress"></textarea></label>
+                    <div class="full form-actions"><button type="submit" class="primary-btn">Save progress note</button></div>
+                </form>
+                <div id="progressRecords" class="record-list"></div>
+            </div>
+
+            <!-- Tab 6: Combined History -->
+            <div class="tab-content" id="historyTab" hidden>
+                <h3>Client history</h3>
+                <p class="muted">A combined timeline of this client's consultations, meal plans, goals, follow-ups and progress notes.</p>
+                <div id="historyRecords" class="record-list"></div>
+            </div>
+        </section>
+
+        <footer>Demo project · Information is stored in this browser using local storage.</footer>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
